@@ -2,7 +2,7 @@
 
 if [ "$1" == "deploy" ]; then
     # Build the environment variable string
-    ENV_VARS=$(grep -v '^#' .env | xargs | tr ' ' ',')
+    ENV_VARS=$(grep -v '^#' .env.dev | xargs | tr ' ' ',')
 
     # Google Cloud Run deployment
     gcloud run deploy lifex-backend-api-users-v1 --source . \
@@ -12,7 +12,7 @@ if [ "$1" == "deploy" ]; then
         --platform managed \
         --region europe-west2
 
-elif [ "$1" == "vocodeDemo" ]; then
+elif [ "$1" == "deployVocodeDemo" ]; then
 
     # Google Cloud Run deployment
     gcloud run deploy lifex-vocode-demo-v1 --source ./vocode-sdk-demo/ \

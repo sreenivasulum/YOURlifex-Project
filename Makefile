@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: all clean test install run deploy down
+.PHONY: all clean test install run deploy down deploy-react deploy-api
 
 all: clean test install run deploy down
 
@@ -15,10 +15,15 @@ install: generate_dot_env
 run:
 	echo 'load your google key.json file to key.json or adjust the path'
 	export GOOGLE_APPLICATION_CREDENTIALS=key.json
-	PYTHONPATH=lifex_users_api/ poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8080 --log-level trace
+	PYTHONPATH=lifex_users_api/ poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8089 --log-level trace
 
+deploy-api:
+	bash scripts/deploy_cloud_run.sh deploy
+deploy-react:
+	bash scripts/deploy_cloud_run.sh deployVocodeDemo
 deploy:
 	bash scripts/deploy_cloud_run.sh deploy
+	bash scripts/deploy_cloud_run.sh deployVocodeDemo
 
 destroy:
 	gcloud run services delete lifex-backend-api-v1

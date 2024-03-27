@@ -11,6 +11,7 @@ vocode = {git = "https://github.com/sulydeni/vocode-python.git"}
 fastapi = "0.100.1"
 python-dotenv = "^1.0.0"
 elevenlabs = "^0.2.27"
+loguru = "^0.7.2"
 
 [tool.poetry.group.dev.dependencies]
 
