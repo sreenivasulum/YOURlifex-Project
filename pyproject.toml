@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "lifex-users-api"
+version = "0.1.0"
+description = "An api that uses vocode and questions_answers_api to interact with users"
+authors = ["Suleiman Deni <sulydeni@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<3.12"
+vocode = {git = "https://github.com/sulydeni/vocode-python.git"}
+fastapi = "0.100.1"
+python-dotenv = "^1.0.0"
+elevenlabs = "^0.2.27"
+
+[tool.poetry.group.dev.dependencies]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
