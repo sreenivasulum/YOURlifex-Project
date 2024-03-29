@@ -12,6 +12,8 @@ fastapi = "0.100.1"
 python-dotenv = "^1.0.0"
 elevenlabs = "^0.2.27"
 loguru = "^0.7.2"
+psycopg2-binary = "^2.9.9"
+sqlalchemy = "^2.0.29"
 
 [tool.poetry.group.dev.dependencies]
 

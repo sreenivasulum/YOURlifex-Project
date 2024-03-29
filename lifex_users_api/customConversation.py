@@ -1,10 +1,11 @@
 import json
 import logging
+from config import get_user_voice_id
 import os
 from typing import Callable, Optional
 import typing
 
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Path
 from vocode.streaming.agent.base_agent import BaseAgent
 from vocode.streaming.models.client_backend import InputAudioConfig, OutputAudioConfig
 from vocode.streaming.models.synthesizer import ElevenLabsSynthesizerConfig
@@ -27,7 +28,7 @@ from vocode.streaming.transcriber.assembly_ai_transcriber import AssemblyAITrans
 from vocode.streaming.transcriber.base_transcriber import BaseTranscriber
 from vocode.streaming.utils.base_router import BaseRouter
 
-BASE_CONVERSATION_ENDPOINT = "/conversation"
+BASE_CONVERSATION_ENDPOINT = "/conversation/{agent_user_id}/{user_id}"
 
 
 class ConversationRouter(BaseRouter):
@@ -44,7 +45,7 @@ class ConversationRouter(BaseRouter):
         ),
         synthesizer_thunk: Callable[
             [OutputAudioConfig], BaseSynthesizer
-        ] = lambda output_audio_config: ElevenLabsSynthesizer(
+        ] = lambda output_audio_config,agent_user_id: ElevenLabsSynthesizer(
             ElevenLabsSynthesizerConfig.from_output_audio_config(
                 output_audio_config=output_audio_config,
                 api_key=os.getenv("ELEVENLABS_API_KEY"),
@@ -68,37 +69,45 @@ class ConversationRouter(BaseRouter):
         self,
         output_device: WebsocketOutputDevice,
         start_message: AudioConfigStartMessage,
+        agent_user_id: str,
     ) -> StreamingConversation:
         transcriber = self.transcriber_thunk(start_message.input_audio_config)
-        synthesizer = self.synthesizer_thunk(start_message.output_audio_config)
+        synthesizer = self.synthesizer_thunk(start_message.output_audio_config, agent_user_id)
         synthesizer.synthesizer_config.should_encode_as_wav = True
         return StreamingConversation(
             output_device=output_device,
             transcriber=transcriber,
-            agent=self.agent_thunk(),
+            agent=self.agent_thunk(agent_user_id=agent_user_id),
             synthesizer=synthesizer,
             conversation_id=start_message.conversation_id,
             logger=self.logger,
         )
 
-    async def conversation(self, websocket: WebSocket):
+    async def conversation(
+            self, 
+            websocket: WebSocket,
+            user_id: str = Path(...),
+            agent_user_id: str = Path(...),
+        ):
         await websocket.accept()
 
-
-        # log to websocket
-        second_logger = custom_websocket_logging(websocket)
-        second_logger.info("Test log message 1")
-
-
-        # print(arear)
-        # import pdb; pdb.set_trace()
-
+        #audio configs
         start_message: AudioConfigStartMessage = AudioConfigStartMessage.parse_obj(
-            {'type': 'websocket_audio_config_start', 'input_audio_config': {'sampling_rate': 48000, 'audio_encoding': 'linear16', 'chunk_size': 2048}, 'output_audio_config': {'sampling_rate': 16000, 'audio_encoding': 'linear16'}}
+            {
+                'type': 'websocket_audio_config_start',
+                'input_audio_config': {
+                    'sampling_rate': 48000,
+                    'audio_encoding': 'linear16',
+                    'chunk_size': 2048
+                },
+                'output_audio_config': {
+                    'sampling_rate': 16000,
+                    'audio_encoding': 'linear16'
+                }
+            }
         )
-
-        #dispose first message
-        arear = await websocket.receive_json()
+        #dispose vocode api first message
+        _ = await websocket.receive_json()
 
 
         self.logger.debug(f"Conversation started")
@@ -107,7 +116,7 @@ class ConversationRouter(BaseRouter):
             start_message.output_audio_config.sampling_rate,
             start_message.output_audio_config.audio_encoding,
         )
-        conversation = self.get_conversation(output_device, start_message)
+        conversation = self.get_conversation(output_device, start_message, agent_user_id)
         await conversation.start(lambda: websocket.send_text(ReadyMessage().json()))
         last_messages = { 'transcripted': None, 'received': None }
         while conversation.is_active():
@@ -148,23 +157,3 @@ class ConversationRouter(BaseRouter):
 
 
 
-import logging
-import asyncio
-
-def custom_websocket_logging(websocket):
-    class WebSocketHandler(logging.Handler):
-        def __init__(self, websocket):
-            super().__init__()
-            self.websocket = websocket
-
-        def emit(self, record):  # Make 'emit' an async function
-            try:
-                log_message = self.format(record)
-                asyncio.run(self.websocket.send(log_message))  # Create a task
-            except Exception as e:
-                print(f"Error sending log message to WebSocket: {e}")
-    # Usage:
-    logger = logging.getLogger(__name__)
-    logger.addHandler(WebSocketHandler(websocket))
-    logger.setLevel(logging.DEBUG) 
-    return logger
