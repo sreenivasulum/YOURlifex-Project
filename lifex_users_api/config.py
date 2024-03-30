@@ -58,9 +58,9 @@ def get_user_voice_id(user_id):
         
         voice_id:str
         if user_rows.first():
+            voice_id= str(user_rows.first()[0])
             logger.info(user_rows.first()[0])
             logger.info("User voice id found!")
-            voice_id= user_rows.first()[0]
         else:
             logger.info("User not found.")
             voice_id = config("ELEVENLABS_VOICE_ID")
