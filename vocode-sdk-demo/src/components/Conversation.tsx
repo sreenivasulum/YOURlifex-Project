@@ -1,4 +1,4 @@
-import { Box, Button, HStack, VStack, Select, Spinner } from "@chakra-ui/react";
+import { Box, Button, HStack, VStack, Select, Spinner, Input } from "@chakra-ui/react";
 import React from "react";
 import { useConversation, AudioDeviceConfig, ConversationConfig } from "vocode";
 import MicrophoneIcon from "./MicrophoneIcon";
@@ -20,8 +20,15 @@ const Conversation = ({
   // const { status, start, stop, analyserNode } = useConversation(
   //   Object.assign(config, { audioDeviceConfig })
   // );
-  const { status, start, stop, analyserNode } = useConversation({
-    backendUrl: "wss://lifex-backend-api-users-v1-aoomkpbnqq-nw.a.run.app/conversation", // looks like ws://localhost:3000/conversation or wss://asdf1234.ngrok.app/conversation if using ngrok
+  const [HumanUserID, setHumanUserID] = React.useState('fd69a44d-d0e9-45f9-a948-30c270e7bacc');
+  const [BotUserID, setBotUserID] = React.useState('fd69a44d-d0e9-45f9-a948-30c270e7bacc');
+  const handleChangeHumanUserID = (event:any) => setHumanUserID(event.target.value);
+  const handleChangeBotUserID = (event:any) => setBotUserID(event.target.value);
+
+
+  let { status, start, stop, analyserNode } = useConversation({
+    backendUrl: `ws://localhost:8089/conversation/${BotUserID}/${HumanUserID}`,
+    // `wss://lifex-backend-api-users-v1-aoomkpbnqq-nw.a.run.app/conversation/${BotUserID}/${HumanUserID}`,
     audioDeviceConfig: {},
   });
   
@@ -139,6 +146,22 @@ const Conversation = ({
               );
             })}
           </Select>
+          <Input
+            placeholder="Enter agent user ID"
+            size="md"
+            my="0.2rem"
+            defaultValue={BotUserID}
+            color={"#FFFFFF"}
+            onChange={handleChangeBotUserID}
+          />
+          <Input
+            placeholder="Enter user ID"
+            size="md"
+            my="0.2rem"
+            defaultValue={HumanUserID}
+            color={"#FFFFFF"}
+            onChange={handleChangeHumanUserID}
+          />
         </HStack>
       )}
       { transcripts.length > 0 && (
@@ -155,3 +178,7 @@ const Conversation = ({
 };
 
 export default Conversation;
+function setValue(value: any) {
+  throw new Error("Function not implemented.");
+}
+
