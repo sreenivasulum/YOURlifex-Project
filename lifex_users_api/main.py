@@ -31,7 +31,7 @@ def rest_lifex_call(agent_user_id: str):
 
     return RESTfulUserImplementedAgent(
             RESTfulUserImplementedAgentConfig(
-                initial_message=BaseMessage(text="How are you doing you?"),
+                initial_message=BaseMessage(text="How are you doing?"),
                 respond=RESTfulUserImplementedAgentConfig.EndpointConfig(
                     url=api_url,
                     method="POST"

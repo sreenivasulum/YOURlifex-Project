@@ -52,6 +52,7 @@ class ConversationRouter(BaseRouter):
                 voice_id=os.getenv("ELEVENLABS_VOICE_ID"),
                 stability=1.0,
                 similarity_boost=1.0,
+                model_id="eleven_turbo_v2",
             ),
         ),
         logger: Optional[logging.Logger] = None,
