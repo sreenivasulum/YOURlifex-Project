@@ -1,3 +1,4 @@
+from functools import cache
 import sys
 import logging
 import time
@@ -37,19 +38,23 @@ url = URL.create(
 )
 
 # Connection String (Adjust for your database type)
-engine = create_engine(
-    url,
-    pool_pre_ping=True,
-    pool_recycle=600,
-)
+@cache
+def get_engine():
+    engine = create_engine(
+        url,
+        pool_pre_ping=True, 
+        pool_recycle=600,
+        pool_size=25,
+    )
+    return engine
 
-# fetech metadata
+# fetch metadata
 metadata = MetaData()
-metadata.reflect(bind=engine)
+metadata.reflect(bind=get_engine())
 
 # provide session and answers table references
 Users = Table('users', metadata)
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=get_engine())
 
 def get_user_voice_id(user_id):
     with Session() as session:

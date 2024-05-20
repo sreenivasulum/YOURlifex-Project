@@ -1,6 +1,5 @@
 import json
 import logging
-from config import get_user_voice_id
 import os
 from typing import Callable, Optional
 import typing
