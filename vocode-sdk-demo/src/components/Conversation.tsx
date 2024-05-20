@@ -1,5 +1,6 @@
 import { Box, Button, HStack, VStack, Select, Spinner, Input } from "@chakra-ui/react";
 import React from "react";
+import queryString from 'query-string';
 import { useConversation, AudioDeviceConfig, ConversationConfig } from "vocode";
 import MicrophoneIcon from "./MicrophoneIcon";
 import AudioVisualization from "./AudioVisualization";
@@ -20,15 +21,13 @@ const Conversation = ({
   // const { status, start, stop, analyserNode } = useConversation(
   //   Object.assign(config, { audioDeviceConfig })
   // );
-  const [HumanUserID, setHumanUserID] = React.useState('fd69a44d-d0e9-45f9-a948-30c270e7bacc');
-  const [BotUserID, setBotUserID] = React.useState('fd69a44d-d0e9-45f9-a948-30c270e7bacc');
-  const handleChangeHumanUserID = (event:any) => setHumanUserID(event.target.value);
-  const handleChangeBotUserID = (event:any) => setBotUserID(event.target.value);
-
+  const params = queryString.parse(window.location.search);
+  const user_id : string = String(params.user_id);
+  const [HumanUserID] = React.useState(user_id);
+  const [BotUserID] = React.useState(user_id);
 
   let { status, start, stop, analyserNode } = useConversation({
-    backendUrl: `ws://localhost:8089/conversation/${BotUserID}/${HumanUserID}`,
-    // `wss://lifex-backend-api-users-v1-aoomkpbnqq-nw.a.run.app/conversation/${BotUserID}/${HumanUserID}`,
+    backendUrl: `wss://lifex-backend-api-users-v1-aoomkpbnqq-nw.a.run.app/conversation/${BotUserID}/${HumanUserID}`,
     audioDeviceConfig: {},
   });
   
@@ -66,7 +65,7 @@ const Conversation = ({
         transform={"translate(-50%, -50%)"}
       >
         <Box boxSize={75}>
-          <MicrophoneIcon color={"#ddfafa"} muted={status !== "connected"} />
+          <MicrophoneIcon color={"#cac5a5"} muted={status !== "connected"} />
         </Box>
       </Button>
       <Box boxSize={50} />
@@ -85,7 +84,8 @@ const Conversation = ({
         <HStack width="96%" position="absolute" top={"10%"} left="2%">
           {inputDevices.length > 0 && (
             <Select
-              color={"#FFFFFF"}
+              color={"black"}
+              borderColor={"black"}
               disabled={["connecting", "connected"].includes(status)}
               onChange={(event) =>
                 setAudioDeviceConfig({
@@ -104,64 +104,6 @@ const Conversation = ({
               })}
             </Select>
           )}
-          {outputDevices.length > 0 && (
-            <Select
-              color={"#FFFFFF"}
-              disabled
-              onChange={(event) =>
-                setAudioDeviceConfig({
-                  ...audioDeviceConfig,
-                  outputDeviceId: event.target.value,
-                })
-              }
-              value={audioDeviceConfig.outputDeviceId}
-            >
-              {outputDevices.map((device, i) => {
-                return (
-                  <option key={i} value={device.deviceId}>
-                    {device.label}
-                  </option>
-                );
-              })}
-            </Select>
-          )}
-          <Select
-            color={"#FFFFFF"}
-            disabled={["connecting", "connected"].includes(status)}
-            onChange={(event) =>
-              event.target.value &&
-              setAudioDeviceConfig({
-                ...audioDeviceConfig,
-                outputSamplingRate: parseInt(event.target.value),
-              })
-            }
-            placeholder="Set output sampling rate"
-            value={audioDeviceConfig.outputSamplingRate}
-          >
-            {["8000", "16000", "24000", "44100", "48000"].map((rate, i) => {
-              return (
-                <option key={i} value={rate}>
-                  {rate} Hz
-                </option>
-              );
-            })}
-          </Select>
-          <Input
-            placeholder="Enter agent user ID"
-            size="md"
-            my="0.2rem"
-            defaultValue={BotUserID}
-            color={"#FFFFFF"}
-            onChange={handleChangeBotUserID}
-          />
-          <Input
-            placeholder="Enter user ID"
-            size="md"
-            my="0.2rem"
-            defaultValue={HumanUserID}
-            color={"#FFFFFF"}
-            onChange={handleChangeHumanUserID}
-          />
         </HStack>
       )}
       { transcripts.length > 0 && (

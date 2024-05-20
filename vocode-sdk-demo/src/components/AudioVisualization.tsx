@@ -28,8 +28,8 @@ const AudioVisualization = ({ analyser }: { analyser: AnalyserNode }) => {
       ctx.translate(canvas.width / 2, canvas.height / 2);
       const max = Math.max(canvas.width, canvas.height);
       const grd = ctx.createLinearGradient(-max / 2, 0, max, 0);
-      grd.addColorStop(0, "hsl(190,100%,15%)");
-      grd.addColorStop(1, "hsl(270,100%,15%)");
+      grd.addColorStop(0, "#8abb83");
+      grd.addColorStop(1, "#e2b4c5");
       ctx.rotate(Math.PI / 4);
       ctx.fillStyle = grd;
       ctx.fillRect(-max, -max, max * 2, max * 2);
@@ -81,8 +81,8 @@ const AudioVisualization = ({ analyser }: { analyser: AnalyserNode }) => {
         //   sections: 5,
         // },
         {
-          color: "hsl( 205, 60%, 55% )",
-          opacity: 0.05,
+          color: "#8abb83",
+          opacity: 0.4,
           distance: 140,
           variance: 5,
           innerRings: 10,
@@ -91,8 +91,8 @@ const AudioVisualization = ({ analyser }: { analyser: AnalyserNode }) => {
           sections: 4,
         },
         {
-          color: "hsl( 205, 60%, 55% )",
-          opacity: 0.2,
+          color: "#8abb83",
+          opacity: 0.4,
           distance: 140,
           variance: 4,
           innerRings: 10,
