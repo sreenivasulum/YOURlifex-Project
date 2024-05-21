@@ -81,8 +81,8 @@ const AudioVisualization = ({ analyser }: { analyser: AnalyserNode }) => {
         //   sections: 5,
         // },
         {
-          color: "#8abb83",
-          opacity: 0.4,
+          color: "green",
+          opacity: 0.1,
           distance: 140,
           variance: 5,
           innerRings: 10,
@@ -91,8 +91,8 @@ const AudioVisualization = ({ analyser }: { analyser: AnalyserNode }) => {
           sections: 4,
         },
         {
-          color: "#8abb83",
-          opacity: 0.4,
+          color: "green",
+          opacity: 0.2,
           distance: 140,
           variance: 4,
           innerRings: 10,

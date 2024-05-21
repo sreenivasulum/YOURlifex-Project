@@ -81,7 +81,7 @@ const Conversation = ({
         </Box>
       )}
       {!isMobile && (
-        <HStack width="96%" position="absolute" top={"10%"} left="2%">
+        <HStack width="25%" position="absolute" top={"10%"} left="2%">
           {inputDevices.length > 0 && (
             <Select
               color={"black"}
