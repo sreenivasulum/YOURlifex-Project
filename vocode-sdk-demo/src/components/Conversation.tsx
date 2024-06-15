@@ -11,6 +11,7 @@ import { useConversation, AudioDeviceConfig, ConversationConfig } from "vocode";
 import MicrophoneIcon from "./MicrophoneIcon";
 import AudioVisualization from "./AudioVisualization";
 import { isMobile } from "react-device-detect";
+import ImageCarousel from "./ImageCarousel";
 
 const Conversation = ({
   config,
@@ -36,12 +37,15 @@ const Conversation = ({
   
   const [apiData, setApiData] = React.useState<any>(null); // Store API data
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isRecording, setIsRecording] = React.useState(false);
   const [showCard, setShowCard] = React.useState(false); // State to control card visibility
 
   React.useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
-        if (!showCard) {
+        if (isRecording) {
+          // console.log(isRecording)
+          // console.log(status)
           const response = await fetch(`https://lifex-backend-api-v1-aoomkpbnqq-nw.a.run.app/api/v1/pull_media_messages/?user_id=${BotUserID}`); // Replace with actual API URL
           if (response.ok) {
             const data = await response.json();
@@ -60,7 +64,7 @@ const Conversation = ({
     }, 5 * 1000); // Check every x seconds
 
     return () => clearInterval(intervalId); // Clear interval on unmount
-  }, []);
+  }, [isRecording, status]);
 
   React.useEffect(() => {
     // Timer to hide the card after x seconds if it's shown
@@ -68,7 +72,8 @@ const Conversation = ({
     if (showCard) {
       timeoutId = setTimeout(() => {
         setShowCard(false);
-      }, 10 * 1000);
+        setIsLoading(true);
+      }, 15 * 1000);
     }
 
     return () => {
@@ -105,7 +110,17 @@ const Conversation = ({
       <Button
         variant="link"
         disabled={["connecting", "error"].includes(status)}
-        onClick={status === "connected" ? stop : start}
+        onClick={
+          () => {
+            if (status === "connected") {
+              setIsRecording(false);
+              return stop();
+            } else {
+              setIsRecording(true);
+              return start();
+            }
+          }
+        }
         position={"absolute"}
         top={"45%"}
         left={"50%"}
@@ -150,16 +165,17 @@ const Conversation = ({
           </CardBody>
         </Card> */}
         <br />
-          {isLoading ? (
+        {
+          isLoading ? (
             <Text style={{ display: "none" }}>Loading...</Text> // Display loading while data fetches
           ) : showCard && status === "connected" && apiData && typeof apiData === 'object' && apiData[0] ? (
             <Card maxW='sm' style={{ right: "5%" }}>
               <CardBody>
-              <Image
+              {/* <Image
                     src={typeof apiData === 'object' && apiData[0] && apiData[0].signed_url ? (apiData[0].signed_url) : null}
-                    alt='Green double couch with wooden legs'
                     borderRadius='lg'
-              />
+              /> */}
+              <ImageCarousel carouselImages={apiData}/>
               <Stack mt='6' spacing='3'>
               {/* Render API data in the card */}
               {/* <Heading size='md'>Image Text</Heading> */}
@@ -171,7 +187,8 @@ const Conversation = ({
             </Card>
           ) : (
             <></> // Display if no data
-          )}
+          )
+        }
         </VStack>
       </Container>
 
@@ -214,8 +231,5 @@ const Conversation = ({
   );
 };
 
-function setValue(value: any) {
-  throw new Error("Function not implemented.");
-}
 
 export default Conversation;
