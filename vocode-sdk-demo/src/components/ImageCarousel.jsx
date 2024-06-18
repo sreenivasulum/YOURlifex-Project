@@ -2,9 +2,10 @@ import Carousel from 'react-bootstrap/Carousel';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const images = [
-  { signed_url: 'https://picsum.photos/400', alt: 'Image 1 Description' },
+  { signed_url: 'https://picsum.photos/200', alt: 'Image 1 Description' },
   { signed_url: 'https://picsum.photos/400?', alt: 'Image 2 Description' },
-  { signed_url: 'https://picsum.photos/400#f', alt: 'Image 3 Description' },
+  { signed_url: 'https://picsum.photos/600/300#f', alt: 'Image 3 Description' },
+  { signed_url: 'https://picsum.photos/200/300#f', alt: 'Image 3 Description' },
 ];
 
 
@@ -37,7 +38,7 @@ function ImageCarousel({ carouselImages = images}) {
   const localApiData = carouselImages.slice(0, maxImagesToDisplay);
 
   return (localApiData.length > 1) ? (
-    <Carousel interval={1000}>
+    <Carousel interval={2000}>
       {localApiData.slice(0, maxImagesToDisplay).map((image, index) => (
         <Carousel.Item key={index}> 
           <img
